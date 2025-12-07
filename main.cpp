@@ -26,8 +26,7 @@ int main() {
         int numer_menu;
         cin >> numer_menu;
         if (numer_menu == 1) {
-            int szerokosc, wysokosc;
-            string tytul_okna;
+            float szerokosc, wysokosc, predkosc_ruchu;
             cout << "Wybrano opcje 1" << endl;
             cout << "Podaj szerokosc : " << endl;
             cin >> szerokosc;
@@ -36,7 +35,7 @@ int main() {
             cout << "Podaj tytul okna : " << endl;
             cin >> tytul_okna;
             cout << "Uruchamiam gre" << endl;
-            uruchomGre(tytul_okna, wysokosc, szerokosc);
+            uruchomGre(predkosc_ruchu, wysokosc, szerokosc);
         } else if (numer_menu == 2){
             cout << "Wybrano opcje 2" << endl;
             cout << "Zamykam program" << endl;
