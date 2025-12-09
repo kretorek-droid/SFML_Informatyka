@@ -7,106 +7,87 @@ using namespace std;
 class Figura {
 protected:
     sf::Shape* ksztaltBazowy;
-    float predkosc;
+
 
 public:
     void narysuj(sf::RenderWindow& okno) {
         okno.draw(*ksztaltBazowy);
     }
-
-    void steruj() {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-            ksztaltBazowy->move({ -predkosc, 0});
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-            ksztaltBazowy->move({predkosc, 0});
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
-             ksztaltBazowy->move({0, -predkosc});
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
-             ksztaltBazowy->move({0, predkosc});
-        }
+    sf::FloatRect pobierzGranice() {
+        return ksztaltBazowy->getGlobalBounds();
     }
+
 };
 
-class Kwadrat : public Figura{
+class Deska : public Figura{
 public:
-    sf::RectangleShape danyKwadrat;
+    sf::RectangleShape danaDeska;
+    float predkosc;
 
 
+    Deska(float szer, float pred) {
+        danaDeska.setSize({szer, 20});
+        danaDeska.setOrigin({szer/2, 20/2});
+        danaDeska.setPosition({400,550});
+        danaDeska.setFillColor({sf::Color::Red});
 
-    Kwadrat(float szer, float wys, float pred) {
-        danyKwadrat.setSize({szer, wys});
-        danyKwadrat.setOrigin({szer/2, wys/2});
-        danyKwadrat.setPosition({400,300});
-        danyKwadrat.setFillColor({sf::Color::Red});
-
-        ksztaltBazowy = &danyKwadrat;
+        ksztaltBazowy = &danaDeska;
         predkosc = pred;
     }
 
 };
 
-class Kolo : public Figura {
+class Pilka : public Figura {
 public:
-    sf::CircleShape daneKolo;
+    sf::CircleShape danaPilka;
+    sf::Vector2f wektorPredkosci;
 
-    Kolo(float promien, float pred) {
-        daneKolo.setRadius(promien);
-        daneKolo.setPosition({300,300});
-        daneKolo.setOrigin({promien, promien});
-        daneKolo.setFillColor(sf::Color::Green);
+    Pilka(float start_x, float start_y) {
+        float promien = 10;
+        danaPilka.setRadius(promien);
+        danaPilka.setOrigin({promien, promien});
+        danaPilka.setPosition({start_x, start_y});
+        danaPilka.setFillColor(sf::Color::Blue);
 
-        ksztaltBazowy = &daneKolo;
-        predkosc = pred * 0.5f;
+        ksztaltBazowy = &danaPilka;
+        wektorPredkosci = {3,3};
     }
+
+    void aktualizuj() {
+        danaPilka.move(wektorPredkosci);
+    }
+
+
+
 };
 
 
-void uruchomGre(float predkosc_ruchu, float wys_kw, float szer_kw) {
-    sf::RenderWindow window(sf::VideoMode({800 , 600}), "Gra");
-    window.setFramerateLimit(60);    // ustawienie limitu klatek na sekundę
+
+void uruchomGre(float predkosc_ruchu, float szer_kw) {
+    sf::RenderWindow okno(sf::VideoMode({800 , 600}), "Gra");
+    okno.setFramerateLimit(60);    // ustawienie limitu klatek na sekundę
 
     float predkosc = predkosc_ruchu;
 
-    Kwadrat kwadrat(szer_kw, wys_kw, predkosc);
-    Kolo kolo(20,predkosc);
-
-    sf::CircleShape koloAnimowane;
-    koloAnimowane.setRadius(40);
-    koloAnimowane.setOrigin({40,40});
-    koloAnimowane.setFillColor(sf::Color::Yellow);
-
-    sf::Clock zegar;
+    Deska gracz(szer_kw, predkosc);
+    Pilka pilka1(400,300);
 
 
-    float zasieg = 150.f;
-    float baza_x = 200.f;
-    float baza_y = 150.f;
-    float szybkosc = 2.f;
 
-    while (window.isOpen()) {
-        while (auto event = window.pollEvent()) {
+    while (okno.isOpen()) {
+        while (auto event = okno.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
 
         //sterowanie z klawiatury
-        kwadrat.steruj();
-        kolo.steruj();
+        gracz.steruj();
+        pilka1.aktualizuj();
 
-        float t = zegar.getElapsedTime().asSeconds();
-        float x = baza_x + std::sin(t*szybkosc)*zasieg;
-        float y = baza_y;
-        koloAnimowane.setPosition({x, y});
-
-
-        window.clear();
-        window.draw(koloAnimowane);
-        kwadrat.narysuj(window);
-        kolo.narysuj(window);
-        window.display();
+        okno.clear();
+        gracz.narysuj(okno);
+        pilka1.narysuj(okno);
+        okno.display();
     }
 }
 
@@ -119,18 +100,15 @@ int main() {
         int numer_menu;
         cin >> numer_menu;
         if (numer_menu == 1) {
-            float szerokosc, wysokosc, predkosc_ruchu;
-            cout << "Wybrano opcje 1" << endl;
-            cout << "Podaj szerokosc : " << endl;
-            cin >> szerokosc;
-            cout << "Podaj wysokosc : " << endl;
-            cin >> wysokosc;
-            cout << "Podaj predkosc ruch : " << endl;
-            cin >> predkosc_ruchu;
-            cout << "Uruchamiam gre" << endl;
-            uruchomGre(predkosc_ruchu, wysokosc, szerokosc);
+            cout << "Uruchamiam gre - poziom latwy" << endl;
+            uruchomGre(10, 200);
         } else if (numer_menu == 2){
-            cout << "Wybrano opcje 2" << endl;
+            cout << "Uruchamiam gre - poziom sredni" << endl;
+            uruchomGre(10, 100);
+        } else if (numer_menu == 3) {
+            cout << "Uruchamiam gre - poziom trudny" << endl;
+            uruchomGre(10, 50);
+        } else if (numer_menu == 4) {
             cout << "Zamykam program" << endl;
             break;
         } else {
