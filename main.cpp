@@ -50,13 +50,17 @@ public:
         danaPilka.setFillColor(sf::Color::Blue);
 
         ksztaltBazowy = &danaPilka;
-        wektorPredkosci = {3,3};
+        reset(start_x, start_y);
     }
 
     void aktualizuj() {
         danaPilka.move(wektorPredkosci);
     }
 
+
+    void odbijOdDeski() {
+        wektorPredkosci.y = -std::abs(wektorPredkosci.y);
+    }
 
 
 };
@@ -72,7 +76,7 @@ void uruchomGre(float predkosc_ruchu, float szer_kw) {
     Deska gracz(szer_kw, predkosc);
     Pilka pilka1(400,300);
 
-
+    int zycia = 3;
 
     while (okno.isOpen()) {
         while (auto event = okno.pollEvent()) {
@@ -87,6 +91,8 @@ void uruchomGre(float predkosc_ruchu, float szer_kw) {
         okno.clear();
         gracz.narysuj(okno);
         pilka1.narysuj(okno);
+        przeszkoda.narysuj(okno);
+
         okno.display();
     }
 }
